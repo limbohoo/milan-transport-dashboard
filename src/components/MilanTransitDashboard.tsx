@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Train, Clock, CloudRain, Wind, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from './ui/card';
 
 export function MilanTransitDashboard() {
@@ -153,33 +153,43 @@ export function MilanTransitDashboard() {
     return routes[line] || '';
   };
 
-  // Effect for news rotation and time update
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length);
-      setCurrentTime(new Date());
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [breakingNews.length]);
+// Add this before the useEffect
+const fetchWeatherData = useCallback(async () => {
+  // ... rest of the weather fetch code ...
+}, []);
 
-  // Effect for API data fetching
-  useEffect(() => {
-    // Initial fetch
-    fetchWeatherData();
-    fetchAirQuality();
-    fetchMetroData();
+const fetchAirQuality = useCallback(async () => {
+  // ... rest of the air quality fetch code ...
+}, []);
 
-    // Set up intervals for updates
-    const weatherInterval = setInterval(fetchWeatherData, 300000); // 5 minutes
-    const aqiInterval = setInterval(fetchAirQuality, 300000);
-    const metroInterval = setInterval(fetchMetroData, 60000); // 1 minute
+const fetchMetroData = useCallback(async () => {
+  // ... rest of the metro fetch code ...
+}, []);
 
-    return () => {
-      clearInterval(weatherInterval);
-      clearInterval(aqiInterval);
-      clearInterval(metroInterval);
-    };
-  }, []);
+// Update the useEffect with dependencies
+useEffect(() => {
+  // Initial fetch
+  const fetchData = async () => {
+    await Promise.all([
+      fetchWeatherData(),
+      fetchAirQuality(),
+      fetchMetroData()
+    ]);
+  };
+
+  fetchData();
+
+  // Set up intervals for updates
+  const weatherInterval = setInterval(fetchWeatherData, 300000);
+  const aqiInterval = setInterval(fetchAirQuality, 300000);
+  const metroInterval = setInterval(fetchMetroData, 60000);
+
+  return () => {
+    clearInterval(weatherInterval);
+    clearInterval(aqiInterval);
+    clearInterval(metroInterval);
+  };
+}, [fetchWeatherData, fetchAirQuality, fetchMetroData]);
 
   return (
     <div className="min-h-screen bg-gray-50">
