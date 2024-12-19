@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// Only import the icons we're actually using
 import { Train, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
@@ -21,14 +20,13 @@ export function MilanTransitDashboard() {
     { line: 'M3', color: 'bg-yellow-500', status: 'Normal', nextTrain: '1 min' }
   ]);
 
-  // Fix the useEffect dependency warning
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length);
       setCurrentTime(new Date());
     }, 5000);
     return () => clearInterval(interval);
-  }, [breakingNews.length]); // Add breakingNews.length as dependency
+  }, [breakingNews.length]);
 
   return (
     <div className="min-h-screen bg-gray-100">

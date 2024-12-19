@@ -1,10 +1,9 @@
-import { MilanTransitDashboard } from '@/components/MilanTransitDashboard';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { MilanTransitDashboard } from '../components/MilanTransitDashboard';
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen">
       <MilanTransitDashboard />
-	<SpeedInsights />
     </main>
   );
 }
