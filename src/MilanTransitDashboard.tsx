@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Train, Bus, Wind, CloudRain, Clock } from 'lucide-react';
+// Remove unused imports, keep only what we're using
+import { Train, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 export function MilanTransitDashboard() {
@@ -20,14 +21,16 @@ export function MilanTransitDashboard() {
     { line: 'M3', color: 'bg-yellow-500', status: 'Normal', nextTrain: '1 min' }
   ]);
 
+  // Fix the useEffect dependency warning by adding breakingNews.length
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length);
       setCurrentTime(new Date());
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [breakingNews.length]);  // Add the dependency here
 
+  // Rest of your component code remains the same
   return (
     <div className="min-h-screen bg-gray-100">
       {/* News Ticker */}
