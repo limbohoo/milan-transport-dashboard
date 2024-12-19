@@ -9,15 +9,40 @@ interface NewsItem {
   en: string;
   it: string;
   zh: string;
-  [key: string]: string; // 添加索引签名
+  [key: string]: string;
+}
+
+interface MetroLine {
+  line: string;
+  color: string;
+  status: string;
+  nextTrain: string;
+  mainRoute: string;
+  branches: string[];
+}
+
+interface Airport {
+  airport: string;
+  services: {
+    name: string;
+    route: string;
+    frequency: string;
+    duration: string;
+    nextDeparture: string;
+  }[];
+  flights: {
+    flight: string;
+    destination: string;
+    status: string;
+    time: string;
+  }[];
 }
 
 export function MilanTransitDashboard() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
-  
-  // 使用类型注解的新闻数据
+
   const breakingNews: NewsItem[] = [
     {
       en: "Major Cultural Festival at Piazza Duomo",
@@ -32,9 +57,10 @@ export function MilanTransitDashboard() {
     {
       en: "International Tech Week Coming to Milano",
       it: "Settimana Internazionale della Tecnologia a Milano",
-      zh: "Design周将在米兰举办",
+      zh: "国际科技周即将在米兰举办",
     },
   ];
+
   const [weatherData] = useState({
     temperature: '22°C',
     condition: 'Partly Cloudy',
@@ -49,8 +75,7 @@ export function MilanTransitDashboard() {
     pm10: 25
   });
 
-  // 米兰地铁线路数据
-  const [metroLines] = useState([
+  const [metroLines] = useState<MetroLine[]>([
     { 
       line: 'M1', 
       color: 'bg-[#FF0000]',
@@ -99,8 +124,7 @@ export function MilanTransitDashboard() {
     }
   ]);
 
-  // 机场快线信息
-  const airportServices = [
+  const [airportServices] = useState<Airport[]>([
     {
       airport: 'Malpensa Airport (MXP)',
       services: [
@@ -149,7 +173,7 @@ export function MilanTransitDashboard() {
         { flight: 'W63456', destination: 'Madrid', status: 'Delayed', time: '12:30' }
       ]
     }
-  ];
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -161,7 +185,7 @@ export function MilanTransitDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* News Ticker with Language Selection */}
+      {/* News Ticker */}
       <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 text-white shadow-lg">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-2">
@@ -171,7 +195,7 @@ export function MilanTransitDashboard() {
             </div>
             <select
               value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
+              onChange={(e) => setSelectedLanguage(e.target.value as 'en' | 'it' | 'zh')}
               className="bg-red-700 text-white border border-red-400 rounded px-2 py-1"
             >
               <option value="en">English</option>
@@ -180,24 +204,25 @@ export function MilanTransitDashboard() {
             </select>
           </div>
           <div className="overflow-hidden relative h-8">
-           <div className="animate-marquee whitespace-nowrap absolute">
-            {breakingNews[currentNewsIndex][selectedLanguage]}
+            <div className="animate-marquee whitespace-nowrap absolute">
+              {breakingNews[currentNewsIndex][selectedLanguage]}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Top Row - Time, Weather, and Air Quality */}
+        {/* Top Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="p-4 col-span-1 hover:shadow-lg transition-shadow duration-200">
+          <Card className="p-4">
             <div className="flex justify-between items-center text-gray-800">
               <Clock className="text-blue-600 h-6 w-6" />
               <span className="text-2xl font-mono">{currentTime.toLocaleTimeString()}</span>
             </div>
           </Card>
           
-          <Card className="p-4 col-span-1 hover:shadow-lg transition-shadow duration-200">
+          <Card className="p-4">
             <div className="flex items-center justify-between text-gray-800">
               <div className="flex items-center">
                 <CloudRain className="text-purple-500 h-6 w-6 mr-2" />
@@ -213,7 +238,7 @@ export function MilanTransitDashboard() {
             </div>
           </Card>
 
-          <Card className="p-4 col-span-1 hover:shadow-lg transition-shadow duration-200">
+          <Card className="p-4">
             <div className="flex items-center justify-between text-gray-800">
               <div className="flex items-center">
                 <Wind className="text-green-500 h-6 w-6 mr-2" />
@@ -238,13 +263,42 @@ export function MilanTransitDashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {metroLines.map(line => (
-              <div key={line.line}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                  <div className={`${line.color} p-5 text-white`}>
-                    <h3 className="text-xl font-bold">Line {line.line}</h3>
+              <Card key={line.line} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <div className={`${line.color} p-5 text-white`}>
+                  <h3 className="text-xl font-bold">Line {line.line}</h3>
+                </div>
+                <div className="p-5 bg-white">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center text-gray-800">
+                      <span className="text-gray-600">Status:</span>
+                      <span className={`px-3 py-1 rounded-full ${
+                        line.status === 'Normal' ? 'bg-green-100 text-green-800' : 
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {line.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-gray-800">
+                      <span className="text-gray-600">Next Train:</span>
+                      <span className="font-medium">{line.nextTrain}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <div className="font-medium mb-1">Main Route:</div>
+                      <div className="text-gray-500">{line.mainRoute}</div>
+                      {line.branches.length > 0 && (
+                        <div className="mt-2">
+                          <div className="font-medium mb-1">Branches:</div>
+                          {line.branches.map((branch, index) => (
+                            <div key={index} className="text-gray-500 text-sm">
+                              {branch}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </Card>
-              </div>
+                </div>
+              </Card>
             ))}
           </div>
         </div>
@@ -256,13 +310,12 @@ export function MilanTransitDashboard() {
             Airport Connections
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {airportServices.map((airport) => (
-              <div key={airport.airport}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                  <div className="bg-blue-600 p-5 text-white">
-                    <h3 className="text-xl font-bold">{airport.airport}</h3>
-                  </div>
-                  <div className="p-5 bg-white">
+            {airportServices.map((airport, index) => (
+              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <div className="bg-blue-600 p-5 text-white">
+                  <h3 className="text-xl font-bold">{airport.airport}</h3>
+                </div>
+                <div className="p-5 bg-white">
                   <div className="space-y-4">
                     {airport.services.map((service, sIndex) => (
                       <div key={sIndex} className="text-gray-800">
