@@ -11,11 +11,31 @@
   animation: marquee 20s linear infinite;
 }
 
-/* 添加卡片悬停效果 */
-.hover\:shadow-lg {
-  transition: all 0.3s ease;
+/* Hover effects for cards */
+.card-hover-effect {
+  transition: all 0.3s ease-in-out;
 }
 
-/* 添加平滑过渡效果 */
-.transition-all {
-  transition
+.card-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
