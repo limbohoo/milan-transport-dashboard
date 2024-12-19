@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { NewsHeader } from '@/components/NewsHeader';
-import { WeatherPanel } from '@/components/WeatherPanel';
-import { MetroStatus } from '@/components/MetroStatus';
-import { AirportInfo } from '@/components/AirportInfo';
-import { FlightsTable } from '@/components/FlightsTable';
+import { NewsHeader } from './NewsHeader';
+import { WeatherPanel } from './WeatherPanel';
+import { MetroStatus } from './MetroStatus';
+import { AirportInfo } from './AirportInfo';
+import { FlightsTable } from './FlightsTable';
 
-export default function Home() {
+export function MilanTransitDashboard() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <div>
       {/* News Header */}
       <NewsHeader />
 
@@ -31,3 +31,10 @@ export default function Home() {
         </section>
 
         {/* Flights Table Section */}
+        <section>
+          <FlightsTable />
+        </section>
+      </div>
+    </div>
+  );
+}
