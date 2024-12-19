@@ -201,7 +201,7 @@ export function AirportInfo() {
                     {getTransportIcon(transport.type)}
                     <span className="font-medium text-gray-800">{transport.name}</span>
                   </div>
-                  
+                  <a
                     href={transport.bookingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
