@@ -50,62 +50,192 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 ;
 ;
 function MilanTransitDashboard() {
+    // State management
     const [currentNewsIndex, setCurrentNewsIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
     const [currentTime, setCurrentTime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(new Date());
     const [weatherData, setWeatherData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
-        temperature: '22°C',
-        condition: 'Partly Cloudy',
-        humidity: '65%',
-        precipitation: '30%'
+        temperature: '--°C',
+        condition: 'Loading...',
+        humidity: '--',
+        precipitation: '--'
     });
     const [airQuality, setAirQuality] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
-        index: 45,
-        status: 'Good',
-        pm25: 15,
-        pm10: 25
+        index: 0,
+        status: 'Loading...',
+        pm25: 0,
+        pm10: 0
     });
-    const breakingNews = [
-        "Breaking: Major Cultural Festival Announced in Central Milan",
-        "Update: New Metro Line Extension Project Approved",
-        "Alert: International Tech Conference Coming to Milano"
-    ];
-    const [metroLines] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([
+    const [metroLines, setMetroLines] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([
         {
             line: 'M1',
             color: 'bg-red-500',
-            status: 'Normal',
-            nextTrain: '2 min',
+            status: 'Loading...',
+            nextTrain: '--',
             route: 'Sesto FS ↔ Rho Fiera'
         },
         {
             line: 'M2',
             color: 'bg-green-500',
-            status: 'Delayed',
-            nextTrain: '4 min',
+            status: 'Loading...',
+            nextTrain: '--',
             route: 'Assago Forum ↔ Gessate'
         },
         {
             line: 'M3',
             color: 'bg-yellow-500',
-            status: 'Normal',
-            nextTrain: '1 min',
+            status: 'Loading...',
+            nextTrain: '--',
             route: 'Comasina ↔ San Donato'
         },
         {
             line: 'M4',
             color: 'bg-blue-500',
-            status: 'Normal',
-            nextTrain: '3 min',
+            status: 'Loading...',
+            nextTrain: '--',
             route: 'Linate ↔ San Babila'
         },
         {
             line: 'M5',
             color: 'bg-purple-500',
-            status: 'Normal',
-            nextTrain: '2 min',
+            status: 'Loading...',
+            nextTrain: '--',
             route: 'Bignami ↔ San Siro'
         }
     ]);
+    const breakingNews = [
+        "Breaking: Major Cultural Festival Announced in Central Milan",
+        "Update: New Metro Line Extension Project Approved",
+        "Alert: International Tech Conference Coming to Milano"
+    ];
+    // Weather API
+    const fetchWeatherData = async ()=>{
+        try {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Milan,IT&units=metric&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`);
+            const data = await response.json();
+            setWeatherData({
+                temperature: `${Math.round(data.main.temp)}°C`,
+                condition: data.weather[0].main,
+                humidity: `${data.main.humidity}%`,
+                precipitation: data.rain ? `${data.rain['1h']}mm` : '0mm'
+            });
+        } catch (error) {
+            console.error('Error fetching weather data:', error);
+            setWeatherData((prev)=>({
+                    ...prev,
+                    condition: 'Error loading weather'
+                }));
+        }
+    };
+    // Air Quality API
+    const fetchAirQuality = async ()=>{
+        try {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=45.4642&lon=9.1900&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`);
+            const data = await response.json();
+            const aqi = data.list[0].main.aqi;
+            const status = getAQIStatus(aqi);
+            setAirQuality({
+                index: aqi,
+                status: status,
+                pm25: Math.round(data.list[0].components.pm2_5),
+                pm10: Math.round(data.list[0].components.pm10)
+            });
+        } catch (error) {
+            console.error('Error fetching air quality:', error);
+            setAirQuality((prev)=>({
+                    ...prev,
+                    status: 'Error loading AQI'
+                }));
+        }
+    };
+    // Helper function for AQI status
+    const getAQIStatus = (aqi)=>{
+        switch(aqi){
+            case 1:
+                return 'Good';
+            case 2:
+                return 'Fair';
+            case 3:
+                return 'Moderate';
+            case 4:
+                return 'Poor';
+            case 5:
+                return 'Very Poor';
+            default:
+                return 'Unknown';
+        }
+    };
+    // ATM Milano Metro API (example - replace with actual API)
+    const fetchMetroData = async ()=>{
+        try {
+            // This is a placeholder - replace with actual ATM API endpoint
+            // const response = await fetch('https://api.atm-mi.it/lines/status');
+            // const data = await response.json();
+            // Simulated data - replace with actual API data
+            const mockData = [
+                {
+                    id: 'M1',
+                    status: 'Normal',
+                    nextTrain: '2 min'
+                },
+                {
+                    id: 'M2',
+                    status: 'Delayed',
+                    nextTrain: '4 min'
+                },
+                {
+                    id: 'M3',
+                    status: 'Normal',
+                    nextTrain: '1 min'
+                },
+                {
+                    id: 'M4',
+                    status: 'Normal',
+                    nextTrain: '3 min'
+                },
+                {
+                    id: 'M5',
+                    status: 'Normal',
+                    nextTrain: '2 min'
+                }
+            ];
+            const updatedLines = mockData.map((line)=>({
+                    line: line.id,
+                    color: getLineColor(line.id),
+                    status: line.status,
+                    nextTrain: line.nextTrain,
+                    route: getLineRoute(line.id)
+                }));
+            setMetroLines(updatedLines);
+        } catch (error) {
+            console.error('Error fetching metro data:', error);
+            setMetroLines((prev)=>prev.map((line)=>({
+                        ...line,
+                        status: 'Error loading status'
+                    })));
+        }
+    };
+    // Helper functions for metro data
+    const getLineColor = (line)=>{
+        const colors = {
+            'M1': 'bg-red-500',
+            'M2': 'bg-green-500',
+            'M3': 'bg-yellow-500',
+            'M4': 'bg-blue-500',
+            'M5': 'bg-purple-500'
+        };
+        return colors[line] || 'bg-gray-500';
+    };
+    const getLineRoute = (line)=>{
+        const routes = {
+            'M1': 'Sesto FS ↔ Rho Fiera',
+            'M2': 'Assago Forum ↔ Gessate',
+            'M3': 'Comasina ↔ San Donato',
+            'M4': 'Linate ↔ San Babila',
+            'M5': 'Bignami ↔ San Siro'
+        };
+        return routes[line] || '';
+    };
+    // Effect for news rotation and time update
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const interval = setInterval(()=>{
             setCurrentNewsIndex((prev)=>(prev + 1) % breakingNews.length);
@@ -115,41 +245,21 @@ function MilanTransitDashboard() {
     }, [
         breakingNews.length
     ]);
-    // Simulated API fetches - replace with real APIs later
-    const fetchMetroData = async ()=>{
-        try {
-            // const response = await fetch('https://api.atm-mi.it/lines/status');
-            console.log('Fetching metro data...');
-        } catch (error) {
-            console.error('Error fetching metro data:', error);
-        }
-    };
-    const fetchWeatherData = async ()=>{
-        try {
-            // const response = await fetch('https://api.weather.com/milan');
-            console.log('Fetching weather data...');
-        } catch (error) {
-            console.error('Error fetching weather data:', error);
-        }
-    };
-    const fetchAirQuality = async ()=>{
-        try {
-            // const response = await fetch('https://api.airquality.com/milan');
-            console.log('Fetching air quality data...');
-        } catch (error) {
-            console.error('Error fetching air quality data:', error);
-        }
-    };
+    // Effect for API data fetching
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        fetchMetroData();
+        // Initial fetch
         fetchWeatherData();
         fetchAirQuality();
-        const interval = setInterval(()=>{
-            fetchMetroData();
-            fetchWeatherData();
-            fetchAirQuality();
-        }, 300000); // Update every 5 minutes
-        return ()=>clearInterval(interval);
+        fetchMetroData();
+        // Set up intervals for updates
+        const weatherInterval = setInterval(fetchWeatherData, 300000); // 5 minutes
+        const aqiInterval = setInterval(fetchAirQuality, 300000);
+        const metroInterval = setInterval(fetchMetroData, 60000); // 1 minute
+        return ()=>{
+            clearInterval(weatherInterval);
+            clearInterval(aqiInterval);
+            clearInterval(metroInterval);
+        };
     }, []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "min-h-screen bg-gray-50",
@@ -163,7 +273,7 @@ function MilanTransitDashboard() {
                             className: "w-3 h-3 bg-white rounded-full animate-pulse mr-2"
                         }, void 0, false, {
                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                            lineNumber: 90,
+                            lineNumber: 189,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -171,7 +281,7 @@ function MilanTransitDashboard() {
                             children: "BREAKING:"
                         }, void 0, false, {
                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                            lineNumber: 91,
+                            lineNumber: 190,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -179,18 +289,18 @@ function MilanTransitDashboard() {
                             children: breakingNews[currentNewsIndex]
                         }, void 0, false, {
                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                            lineNumber: 92,
+                            lineNumber: 191,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                    lineNumber: 89,
+                    lineNumber: 188,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                lineNumber: 88,
+                lineNumber: 187,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -208,7 +318,7 @@ function MilanTransitDashboard() {
                                             className: "text-blue-600 h-6 w-6"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 102,
+                                            lineNumber: 201,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -216,18 +326,18 @@ function MilanTransitDashboard() {
                                             children: currentTime.toLocaleTimeString()
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 103,
+                                            lineNumber: 202,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                    lineNumber: 101,
+                                    lineNumber: 200,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                lineNumber: 100,
+                                lineNumber: 199,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -242,7 +352,7 @@ function MilanTransitDashboard() {
                                                     className: "text-purple-500 h-6 w-6 mr-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 110,
+                                                    lineNumber: 209,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -250,13 +360,13 @@ function MilanTransitDashboard() {
                                                     children: "Weather"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 111,
+                                                    lineNumber: 210,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 109,
+                                            lineNumber: 208,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -267,7 +377,7 @@ function MilanTransitDashboard() {
                                                     children: weatherData.temperature
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 114,
+                                                    lineNumber: 213,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -275,7 +385,7 @@ function MilanTransitDashboard() {
                                                     children: weatherData.condition
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 115,
+                                                    lineNumber: 214,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -288,24 +398,24 @@ function MilanTransitDashboard() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 116,
+                                                    lineNumber: 215,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 113,
+                                            lineNumber: 212,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                    lineNumber: 108,
+                                    lineNumber: 207,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                lineNumber: 107,
+                                lineNumber: 206,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -320,7 +430,7 @@ function MilanTransitDashboard() {
                                                     className: "text-green-500 h-6 w-6 mr-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 126,
+                                                    lineNumber: 225,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -328,13 +438,13 @@ function MilanTransitDashboard() {
                                                     children: "Air Quality"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 127,
+                                                    lineNumber: 226,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 125,
+                                            lineNumber: 224,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -348,7 +458,7 @@ function MilanTransitDashboard() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 130,
+                                                    lineNumber: 229,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -356,7 +466,7 @@ function MilanTransitDashboard() {
                                                     children: airQuality.status
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 131,
+                                                    lineNumber: 230,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -369,30 +479,30 @@ function MilanTransitDashboard() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 132,
+                                                    lineNumber: 231,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                            lineNumber: 129,
+                                            lineNumber: 228,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                    lineNumber: 124,
+                                    lineNumber: 223,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                lineNumber: 123,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                        lineNumber: 99,
+                        lineNumber: 198,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -405,14 +515,14 @@ function MilanTransitDashboard() {
                                         className: "mr-3 text-blue-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                        lineNumber: 143,
+                                        lineNumber: 242,
                                         columnNumber: 13
                                     }, this),
                                     "Metro Status"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                lineNumber: 142,
+                                lineNumber: 241,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -430,12 +540,12 @@ function MilanTransitDashboard() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 150,
+                                                    lineNumber: 249,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                lineNumber: 149,
+                                                lineNumber: 248,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -451,7 +561,7 @@ function MilanTransitDashboard() {
                                                                     children: "Status:"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                                    lineNumber: 155,
+                                                                    lineNumber: 254,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -459,13 +569,13 @@ function MilanTransitDashboard() {
                                                                     children: line.status
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                                    lineNumber: 156,
+                                                                    lineNumber: 255,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                            lineNumber: 154,
+                                                            lineNumber: 253,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -476,7 +586,7 @@ function MilanTransitDashboard() {
                                                                     children: "Next Train:"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                                    lineNumber: 164,
+                                                                    lineNumber: 263,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -484,13 +594,13 @@ function MilanTransitDashboard() {
                                                                     children: line.nextTrain
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                                    lineNumber: 165,
+                                                                    lineNumber: 264,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                            lineNumber: 163,
+                                                            lineNumber: 262,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -498,47 +608,47 @@ function MilanTransitDashboard() {
                                                             children: line.route
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                            lineNumber: 167,
+                                                            lineNumber: 266,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                    lineNumber: 153,
+                                                    lineNumber: 252,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                                lineNumber: 152,
+                                                lineNumber: 251,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, line.line, true, {
                                         fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                        lineNumber: 148,
+                                        lineNumber: 247,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                                lineNumber: 146,
+                                lineNumber: 245,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                        lineNumber: 141,
+                        lineNumber: 240,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-                lineNumber: 97,
+                lineNumber: 196,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/MilanTransitDashboard.tsx",
-        lineNumber: 86,
+        lineNumber: 185,
         columnNumber: 5
     }, this);
 }
