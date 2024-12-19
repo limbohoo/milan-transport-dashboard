@@ -4,13 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { Train, Clock, CloudRain, Wind, Plane } from 'lucide-react';
 import { Card } from './ui/card';
 
+// 定义类型接口
+interface NewsItem {
+  en: string;
+  it: string;
+  zh: string;
+  [key: string]: string; // 添加索引签名
+}
+
 export function MilanTransitDashboard() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
   
-  // 多语言新闻数据
-  const breakingNews = [
+  // 使用类型注解的新闻数据
+  const breakingNews: NewsItem[] = [
     {
       en: "Major Cultural Festival at Piazza Duomo",
       it: "Grande Festival Culturale in Piazza Duomo",
@@ -27,7 +35,6 @@ export function MilanTransitDashboard() {
       zh: "国际科技周即将在米兰举办",
     },
   ];
-
   const [weatherData] = useState({
     temperature: '22°C',
     condition: 'Partly Cloudy',
@@ -173,9 +180,8 @@ export function MilanTransitDashboard() {
             </select>
           </div>
           <div className="overflow-hidden relative h-8">
-            <div className="animate-marquee whitespace-nowrap absolute">
-              {breakingNews[currentNewsIndex][selectedLanguage]}
-            </div>
+           <div className="animate-marquee whitespace-nowrap absolute">
+            {breakingNews[currentNewsIndex][selectedLanguage]}
           </div>
         </div>
       </div>
