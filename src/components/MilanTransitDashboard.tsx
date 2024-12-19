@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Train, Clock } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from './ui/card';
 
 export function MilanTransitDashboard() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
