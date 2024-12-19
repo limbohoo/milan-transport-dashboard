@@ -32,7 +32,7 @@ export function MilanTransitDashboard() {
     {
       en: "International Tech Week Coming to Milano",
       it: "Settimana Internazionale della Tecnologia a Milano",
-      zh: "国际科技周即将在米兰举办",
+      zh: "Design周将在米兰举办",
     },
   ];
   const [weatherData] = useState({
@@ -238,42 +238,13 @@ export function MilanTransitDashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {metroLines.map(line => (
-              <Card key={line.line} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className={`${line.color} p-5 text-white`}>
-                  <h3 className="text-xl font-bold">Line {line.line}</h3>
-                </div>
-                <div className="p-5 bg-white">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center text-gray-800">
-                      <span className="text-gray-600">Status:</span>
-                      <span className={`px-3 py-1 rounded-full ${
-                        line.status === 'Normal' ? 'bg-green-100 text-green-800' : 
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {line.status}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-gray-800">
-                      <span className="text-gray-600">Next Train:</span>
-                      <span className="font-medium">{line.nextTrain}</span>
-                    </div>
-                    <div className="text-sm text-gray-600 mt-2">
-                      <div className="font-medium mb-1">Main Route:</div>
-                      <div className="text-gray-500">{line.mainRoute}</div>
-                      {line.branches.length > 0 && (
-                        <div className="mt-2">
-                          <div className="font-medium mb-1">Branches:</div>
-                          {line.branches.map((branch, index) => (
-                            <div key={index} className="text-gray-500 text-sm">
-                              {branch}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+              <div key={line.line}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                  <div className={`${line.color} p-5 text-white`}>
+                    <h3 className="text-xl font-bold">Line {line.line}</h3>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -285,12 +256,13 @@ export function MilanTransitDashboard() {
             Airport Connections
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {airportServices.map((airport, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className="bg-blue-600 p-5 text-white">
-                  <h3 className="text-xl font-bold">{airport.airport}</h3>
-                </div>
-                <div className="p-5 bg-white">
+            {airportServices.map((airport) => (
+              <div key={airport.airport}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                  <div className="bg-blue-600 p-5 text-white">
+                    <h3 className="text-xl font-bold">{airport.airport}</h3>
+                  </div>
+                  <div className="p-5 bg-white">
                   <div className="space-y-4">
                     {airport.services.map((service, sIndex) => (
                       <div key={sIndex} className="text-gray-800">
