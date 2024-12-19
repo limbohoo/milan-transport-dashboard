@@ -8,17 +8,12 @@
 }
 
 .animate-marquee {
-  animation: marquee 20s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
-/* Hover effects for cards */
-.card-hover-effect {
-  transition: all 0.3s ease-in-out;
-}
-
-.card-hover-effect:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+/* Pause animation on hover */
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
 /* Custom scrollbar */
