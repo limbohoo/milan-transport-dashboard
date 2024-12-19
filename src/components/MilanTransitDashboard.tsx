@@ -1,32 +1,34 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect, useCallback } from 'react';
+import { Train, Clock, CloudRain, Wind } from 'lucide-react';
 import { Card } from './ui/card';
 
 export function MilanTransitDashboard() {
-  // State management
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [weatherData, setWeatherData] = useState({
-    temperature: '--°C',
-    condition: 'Loading...',
-    humidity: '--',
-    precipitation: '--'
-  });
-  const [airQuality, setAirQuality] = useState({
-    index: 0,
-    status: 'Loading...',
-    pm25: 0,
-    pm10: 0
+  
+  // Mock data for demo
+  const [weatherData] = useState({
+    temperature: '22°C',
+    condition: 'Partly Cloudy',
+    humidity: '65%',
+    precipitation: '30%'
   });
 
-  const [metroLines, setMetroLines] = useState([
-    { line: 'M1', color: 'bg-red-500', status: 'Loading...', nextTrain: '--', route: 'Sesto FS ↔ Rho Fiera' },
-    { line: 'M2', color: 'bg-green-500', status: 'Loading...', nextTrain: '--', route: 'Assago Forum ↔ Gessate' },
-    { line: 'M3', color: 'bg-yellow-500', status: 'Loading...', nextTrain: '--', route: 'Comasina ↔ San Donato' },
-    { line: 'M4', color: 'bg-blue-500', status: 'Loading...', nextTrain: '--', route: 'Linate ↔ San Babila' },
-    { line: 'M5', color: 'bg-purple-500', status: 'Loading...', nextTrain: '--', route: 'Bignami ↔ San Siro' }
+  const [airQuality] = useState({
+    index: 45,
+    status: 'Good',
+    pm25: 15,
+    pm10: 25
+  });
+
+  const [metroLines] = useState([
+    { line: 'M1', color: 'bg-red-500', status: 'Normal', nextTrain: '2 min', route: 'Sesto FS ↔ Rho Fiera' },
+    { line: 'M2', color: 'bg-green-500', status: 'Delayed', nextTrain: '4 min', route: 'Assago Forum ↔ Gessate' },
+    { line: 'M3', color: 'bg-yellow-500', status: 'Normal', nextTrain: '1 min', route: 'Comasina ↔ San Donato' },
+    { line: 'M4', color: 'bg-blue-500', status: 'Normal', nextTrain: '3 min', route: 'Linate ↔ San Babila' },
+    { line: 'M5', color: 'bg-purple-500', status: 'Normal', nextTrain: '2 min', route: 'Bignami ↔ San Siro' }
   ]);
 
   const breakingNews = [
@@ -35,161 +37,14 @@ export function MilanTransitDashboard() {
     "Alert: International Tech Conference Coming to Milano",
   ];
 
-  // Weather API
-  const fetchWeatherData = async () => {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=Milan,IT&units=metric&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
-      );
-      const data = await response.json();
-      
-      setWeatherData({
-        temperature: `${Math.round(data.main.temp)}°C`,
-        condition: data.weather[0].main,
-        humidity: `${data.main.humidity}%`,
-        precipitation: data.rain ? `${data.rain['1h']}mm` : '0mm'
-      });
-    } catch (error) {
-      console.error('Error fetching weather data:', error);
-      setWeatherData(prev => ({
-        ...prev,
-        condition: 'Error loading weather'
-      }));
-    }
-  };
-
-  // Air Quality API
-  const fetchAirQuality = async () => {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/air_pollution?lat=45.4642&lon=9.1900&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
-      );
-      const data = await response.json();
-      
-      const aqi = data.list[0].main.aqi;
-      const status = getAQIStatus(aqi);
-      
-      setAirQuality({
-        index: aqi,
-        status: status,
-        pm25: Math.round(data.list[0].components.pm2_5),
-        pm10: Math.round(data.list[0].components.pm10)
-      });
-    } catch (error) {
-      console.error('Error fetching air quality:', error);
-      setAirQuality(prev => ({
-        ...prev,
-        status: 'Error loading AQI'
-      }));
-    }
-  };
-
-  // Helper function for AQI status
-  const getAQIStatus = (aqi: number) => {
-    switch(aqi) {
-      case 1: return 'Good';
-      case 2: return 'Fair';
-      case 3: return 'Moderate';
-      case 4: return 'Poor';
-      case 5: return 'Very Poor';
-      default: return 'Unknown';
-    }
-  };
-
-  // ATM Milano Metro API (example - replace with actual API)
-  const fetchMetroData = async () => {
-    try {
-      // This is a placeholder - replace with actual ATM API endpoint
-      // const response = await fetch('https://api.atm-mi.it/lines/status');
-      // const data = await response.json();
-      
-      // Simulated data - replace with actual API data
-      const mockData = [
-        { id: 'M1', status: 'Normal', nextTrain: '2 min' },
-        { id: 'M2', status: 'Delayed', nextTrain: '4 min' },
-        { id: 'M3', status: 'Normal', nextTrain: '1 min' },
-        { id: 'M4', status: 'Normal', nextTrain: '3 min' },
-        { id: 'M5', status: 'Normal', nextTrain: '2 min' }
-      ];
-      
-      const updatedLines = mockData.map(line => ({
-        line: line.id,
-        color: getLineColor(line.id),
-        status: line.status,
-        nextTrain: line.nextTrain,
-        route: getLineRoute(line.id)
-      }));
-      
-      setMetroLines(updatedLines);
-    } catch (error) {
-      console.error('Error fetching metro data:', error);
-      setMetroLines(prev => prev.map(line => ({
-        ...line,
-        status: 'Error loading status'
-      })));
-    }
-  };
-
-  // Helper functions for metro data
-  const getLineColor = (line: string) => {
-    const colors = {
-      'M1': 'bg-red-500',
-      'M2': 'bg-green-500',
-      'M3': 'bg-yellow-500',
-      'M4': 'bg-blue-500',
-      'M5': 'bg-purple-500'
-    };
-    return colors[line] || 'bg-gray-500';
-  };
-
-  const getLineRoute = (line: string) => {
-    const routes = {
-      'M1': 'Sesto FS ↔ Rho Fiera',
-      'M2': 'Assago Forum ↔ Gessate',
-      'M3': 'Comasina ↔ San Donato',
-      'M4': 'Linate ↔ San Babila',
-      'M5': 'Bignami ↔ San Siro'
-    };
-    return routes[line] || '';
-  };
-
-// Add this before the useEffect
-const fetchWeatherData = useCallback(async () => {
-  // ... rest of the weather fetch code ...
-}, []);
-
-const fetchAirQuality = useCallback(async () => {
-  // ... rest of the air quality fetch code ...
-}, []);
-
-const fetchMetroData = useCallback(async () => {
-  // ... rest of the metro fetch code ...
-}, []);
-
-// Update the useEffect with dependencies
-useEffect(() => {
-  // Initial fetch
-  const fetchData = async () => {
-    await Promise.all([
-      fetchWeatherData(),
-      fetchAirQuality(),
-      fetchMetroData()
-    ]);
-  };
-
-  fetchData();
-
-  // Set up intervals for updates
-  const weatherInterval = setInterval(fetchWeatherData, 300000);
-  const aqiInterval = setInterval(fetchAirQuality, 300000);
-  const metroInterval = setInterval(fetchMetroData, 60000);
-
-  return () => {
-    clearInterval(weatherInterval);
-    clearInterval(aqiInterval);
-    clearInterval(metroInterval);
-  };
-}, [fetchWeatherData, fetchAirQuality, fetchMetroData]);
+  // News rotation and time update
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length);
+      setCurrentTime(new Date());
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [breakingNews.length]);
 
   return (
     <div className="min-h-screen bg-gray-50">
