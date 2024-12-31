@@ -1,33 +1,49 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Train, Clock, CloudRain, Wind, Plane, ChevronDown, Search, ExternalLink, Bus } from 'lucide-react';
+import { Train, Clock, CloudRain, Wind, Plane } from 'lucide-react';
+import { Card } from './ui/card';
 
-// Card Component
-interface CardProps {
-  className?: string;
-  children: React.ReactNode;
+// 定义类型接口
+interface NewsItem {
+  en: string;
+  it: string;
+  zh: string;
+  [key: string]: string;
 }
 
-function Card({ className = "", children }: CardProps) {
-  return (
-    <div className={`rounded-lg border bg-white shadow-sm ${className}`}>
-      {children}
-    </div>
-  );
+interface MetroLine {
+  line: string;
+  color: string;
+  status: string;
+  nextTrain: string;
+  mainRoute: string;
+  branches: string[];
 }
 
-// Main Dashboard Component
+interface Airport {
+  airport: string;
+  services: {
+    name: string;
+    route: string;
+    frequency: string;
+    duration: string;
+    nextDeparture: string;
+  }[];
+  flights: {
+    flight: string;
+    destination: string;
+    status: string;
+    time: string;
+  }[];
+}
+
 export function MilanTransitDashboard() {
-  // States
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
-  const [activeAirport, setActiveAirport] = useState('MXP');
-  const [isWeatherExpanded, setIsWeatherExpanded] = useState(true);
 
-  // News Data
-  const breakingNews = [
+  const breakingNews: NewsItem[] = [
     {
       en: "Major Cultural Festival at Piazza Duomo",
       it: "Grande Festival Culturale in Piazza Duomo",
@@ -45,8 +61,21 @@ export function MilanTransitDashboard() {
     },
   ];
 
-  // Metro Lines Data
-  const metroLines = [
+  const [weatherData] = useState({
+    temperature: '22°C',
+    condition: 'Partly Cloudy',
+    humidity: '65%',
+    precipitation: '30%'
+  });
+
+  const [airQuality] = useState({
+    index: 45,
+    status: 'Good',
+    pm25: 15,
+    pm10: 25
+  });
+
+  const [metroLines] = useState<MetroLine[]>([
     { 
       line: 'M1', 
       color: 'bg-[#FF0000]',
@@ -93,82 +122,59 @@ export function MilanTransitDashboard() {
       mainRoute: 'Bignami ↔ San Siro',
       branches: []
     }
-  ];
+  ]);
 
-  // Airport Data
-  const airports = [
+  const [airportServices] = useState<Airport[]>([
     {
-      code: 'MXP',
-      name: 'Milano Malpensa',
-      transports: [
+      airport: 'Malpensa Airport (MXP)',
+      services: [
         {
           name: 'Malpensa Express',
-          type: 'train' as const,
           route: 'Milano Centrale ↔ Malpensa T1/T2',
-          frequency: 'Every 30 min',
+          frequency: '30 min',
           duration: '52 min',
-          price: '€13',
-          nextDeparture: '10:25',
-          bookingUrl: 'https://www.trenord.it/en/'
+          nextDeparture: '10:25'
         }
       ],
       flights: [
-        {
-          id: '1',
-          flightNo: 'AZ1234',
-          destination: 'London',
-          scheduled: '11:30',
-          status: 'On Time',
-          terminal: 'T1',
-          gate: 'B15'
-        }
+        { flight: 'AZ1234', destination: 'London', status: 'On Time', time: '11:30' },
+        { flight: 'LH5678', destination: 'Frankfurt', status: 'Delayed', time: '12:15' }
       ]
     },
     {
-      code: 'LIN',
-      name: 'Milano Linate',
-      transports: [
+      airport: 'Linate Airport (LIN)',
+      services: [
         {
-          name: 'Metro M4',
-          type: 'metro' as const,
+          name: 'M4 Metro',
           route: 'Linate ↔ San Babila',
-          frequency: 'Every 3 min',
+          frequency: '3 min',
           duration: '15 min',
-          price: '€2.20',
-          nextDeparture: 'Continuous',
-          bookingUrl: 'https://www.atm.it'
+          nextDeparture: 'Continuous Service'
         }
       ],
       flights: [
+        { flight: 'AZ2468', destination: 'Paris', status: 'On Time', time: '10:45' },
+        { flight: 'BA3579', destination: 'Rome', status: 'Boarding', time: '11:00' }
+      ]
+    },
+    {
+      airport: 'Bergamo Orio al Serio (BGY)',
+      services: [
         {
-          id: '2',
-          flightNo: 'AZ2468',
-          destination: 'Rome',
-          scheduled: '10:45',
-          status: 'Boarding',
-          terminal: 'Main',
-          gate: '12'
+          name: 'Airport Bus',
+          route: 'Milano Centrale ↔ Bergamo Airport',
+          frequency: '20 min',
+          duration: '50 min',
+          nextDeparture: '10:40'
         }
+      ],
+      flights: [
+        { flight: 'FR1357', destination: 'Barcelona', status: 'On Time', time: '11:15' },
+        { flight: 'W63456', destination: 'Madrid', status: 'Delayed', time: '12:30' }
       ]
     }
-  ];
+  ]);
 
-  // Weather Data
-  const [weatherData] = useState({
-    temperature: '22°C',
-    condition: 'Partly Cloudy',
-    humidity: '65%',
-    precipitation: '30%'
-  });
-
-  const [airQuality] = useState({
-    index: 45,
-    status: 'Good',
-    pm25: 15,
-    pm10: 25
-  });
-
-  // Effects
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length);
@@ -176,16 +182,6 @@ export function MilanTransitDashboard() {
     }, 5000);
     return () => clearInterval(interval);
   }, [breakingNews.length]);
-
-  // Utility Functions
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Normal': return 'bg-green-100 text-green-800';
-      case 'Delayed': return 'bg-yellow-100 text-yellow-800';
-      case 'Boarding': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -217,12 +213,12 @@ export function MilanTransitDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Weather and Time Section */}
+        {/* Top Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-4">
             <div className="flex justify-between items-center text-gray-800">
               <Clock className="text-blue-600 h-6 w-6" />
-              <span className="text-2xl font-mono">{currentTime.toLocaleTimeString('it-IT')}</span>
+              <span className="text-2xl font-mono">{currentTime.toLocaleTimeString()}</span>
             </div>
           </Card>
           
@@ -275,7 +271,10 @@ export function MilanTransitDashboard() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-gray-800">
                       <span className="text-gray-600">Status:</span>
-                      <span className={`px-3 py-1 rounded-full ${getStatusColor(line.status)}`}>
+                      <span className={`px-3 py-1 rounded-full ${
+                        line.status === 'Normal' ? 'bg-green-100 text-green-800' : 
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
                         {line.status}
                       </span>
                     </div>
@@ -284,7 +283,7 @@ export function MilanTransitDashboard() {
                       <span className="font-medium">{line.nextTrain}</span>
                     </div>
                     <div className="text-sm text-gray-600">
-                      <div className="font-medium mb-1">Route:</div>
+                      <div className="font-medium mb-1">Main Route:</div>
                       <div className="text-gray-500">{line.mainRoute}</div>
                       {line.branches.length > 0 && (
                         <div className="mt-2">
@@ -304,76 +303,63 @@ export function MilanTransitDashboard() {
           </div>
         </div>
 
-        {/* Airport Information */}
+        {/* Airport Services */}
         <div className="space-y-6">
           <h2 className="text-3xl font-bold flex items-center text-gray-800">
             <Plane className="mr-3 text-blue-600" />
             Airport Connections
           </h2>
-          <div className="flex space-x-4 mb-4">
-            {airports.map((airport) => (
-              <button
-                key={airport.code}
-                onClick={() => setActiveAirport(airport.code)}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  activeAirport === airport.code
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {airport.code}
-              </button>
-            ))}
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {airports
-              .filter(airport => airport.code === activeAirport)
-              .map(airport => (
-                <React.Fragment key={airport.code}>
-                  {airport.transports.map((transport, index) => (
-                    <Card key={index} className="p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                          {transport.type === 'train' && <Train className="h-5 w-5 mr-2" />}
-                          {transport.type === 'metro' && <Train className="h-5 w-5 mr-2" />}
-                          {transport.type === 'bus' && <Bus className="h-5 w-5 mr-2" />}
-                          <span className="font-medium">{transport.name}</span>
-                        </div>
-                        <a
-                          href={transport.bookingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline flex items-center"
-                        >
-                          Book <ExternalLink className="h-4 w-4 ml-1" />
-                        </a>
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Route:</span>
-                          <span>{transport.route}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Frequency:</span>
-                          <span>{transport.frequency}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Duration:</span>
-                          <span>{transport.duration}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Price:</span>
-                          <span>{transport.price}</span>
-                        </div>
-                        <div className="flex justify-between font-medium">
-                          <span className="text-gray-600">Next:</span>
-                          <span>{transport.nextDeparture}</span>
+            {airportServices.map((airport, index) => (
+              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <div className="bg-blue-600 p-5 text-white">
+                  <h3 className="text-xl font-bold">{airport.airport}</h3>
+                </div>
+                <div className="p-5 bg-white">
+                  <div className="space-y-4">
+                    {airport.services.map((service, sIndex) => (
+                      <div key={sIndex} className="text-gray-800">
+                        <h4 className="font-bold text-lg mb-2">{service.name}</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Route:</span>
+                            <span>{service.route}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Frequency:</span>
+                            <span>{service.frequency}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Duration:</span>
+                            <span>{service.duration}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Next:</span>
+                            <span>{service.nextDeparture}</span>
+                          </div>
                         </div>
                       </div>
-                    </Card>
-                  ))}
-                </React.Fragment>
-              ))}
+                    ))}
+                    <div className="mt-4">
+                      <h4 className="font-bold text-lg mb-2 text-gray-800">Next Flights</h4>
+                      <div className="space-y-2">
+                        {airport.flights.map((flight, fIndex) => (
+                          <div key={fIndex} className="flex justify-between text-sm text-gray-800">
+                            <span>{flight.flight} to {flight.destination}</span>
+                            <span className={`${
+                              flight.status === 'On Time' ? 'text-green-600' : 
+                              flight.status === 'Boarding' ? 'text-blue-600' : 'text-yellow-600'
+                            }`}>
+                              {flight.status} {flight.time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
