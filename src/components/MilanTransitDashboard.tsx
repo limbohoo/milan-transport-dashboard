@@ -141,7 +141,7 @@ export function MilanTransitDashboard() {
             <TrainFront className="h-8 w-8 text-blue-500" />
             <div className="flex flex-col">
               <span className="text-xl font-bold text-white">Milano Transit</span>
-              <span className="text-sm text-gray-400">Real-time Transportation Hub</span>
+              <span className="text-sm text-black">Real-time Transportation Hub</span>
             </div>
           </div>
         </div>
@@ -236,7 +236,7 @@ export function MilanTransitDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {metroLines.map(line => (
               <Card key={line.line} className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className={`${line.color.replace('bg-[', 'bg-').replace(']', '')} p-5 text-white`}>
+                <div className={`${line.color.replace('bg-[', 'bg-').replace(']', '')} p-5 text-black`}>
                   <h3 className="text-xl font-bold">Line {line.line}</h3>
                 </div>
                 <div className="p-5">
@@ -284,7 +284,7 @@ export function MilanTransitDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {airportServices.map((airport, index) => (
               <Card key={index} className="bg-gray-800 border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className="bg-blue-900 p-5 text-white">
+                <div className="bg-blue-900 p-5 text-black">
                   <h3 className="text-xl font-bold">{airport.airport}</h3>
                 </div>
                 <div className="p-5">
