@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Train, Clock, CloudRain, Wind, Plane } from 'lucide-react';
+import { Train, Clock, Plane } from 'lucide-react';
 import { Card } from './ui/card';
 
 // 定义类型接口
@@ -60,20 +60,6 @@ export function MilanTransitDashboard() {
       zh: "国际科技周即将在米兰举办",
     },
   ];
-
-  const [weatherData] = useState({
-    temperature: '8°C',
-    condition: 'Partly Cloudy',
-    humidity: '65%',
-    precipitation: '30%'
-  });
-
-  const [airQuality] = useState({
-    index: 45,
-    status: 'Good',
-    pm25: 15,
-    pm10: 25
-  });
 
   const [metroLines] = useState<MetroLine[]>([
     { 
