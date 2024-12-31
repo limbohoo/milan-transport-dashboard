@@ -33,6 +33,8 @@ interface Airport {
 
 export function MilanTransitDashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [localTime, setLocalTime] = useState(new Date());
+  
 
   const [metroLines] = useState<MetroLine[]>([
     { 
@@ -137,6 +139,7 @@ export function MilanTransitDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
+      setLocalTime(new Date());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -160,26 +163,53 @@ export function MilanTransitDashboard() {
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Top Section with Clock and Live TV */}
         <div className="grid grid-cols-12 gap-6">
-          {/* LED Clock */}
+          {/* LED Clocks */}
           <div className="col-span-12 lg:col-span-4">
             <Card className="bg-black border-gray-800">
               <div className="p-6">
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="font-mono text-6xl font-bold text-yellow-400 tabular-nums tracking-wider filter drop-shadow-lg animate-pulse">
-                    {currentTime.toLocaleTimeString('en-US', {
-                      hour12: false,
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
+                <div className="space-y-6">
+                  {/* Italian Time */}
+                  <div className="flex flex-col items-center">
+                    <div className="text-gray-400 mb-1 font-medium">Milano</div>
+                    <div className="font-mono text-5xl font-bold text-yellow-400 tabular-nums tracking-wider filter drop-shadow-lg animate-pulse">
+                      {new Date().toLocaleTimeString('it-IT', {
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        timeZone: 'Europe/Rome'
+                      })}
+                    </div>
+                    <div className="text-gray-500 mt-2 font-mono text-sm">
+                      {new Date().toLocaleDateString('it-IT', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        timeZone: 'Europe/Rome'
+                      })}
+                    </div>
                   </div>
-                  <div className="text-gray-500 mt-2 font-mono">
-                    {currentTime.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+
+                  <div className="border-t border-gray-800"></div>
+
+                  {/* Local Time */}
+                  <div className="flex flex-col items-center">
+                    <div className="text-gray-400 mb-1 font-medium">Local Time</div>
+                    <div className="font-mono text-5xl font-bold text-green-400 tabular-nums tracking-wider filter drop-shadow-lg animate-pulse">
+                      {new Date().toLocaleTimeString('en-US', {
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </div>
+                    <div className="text-gray-500 mt-2 font-mono text-sm">
+                      {new Date().toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,33 +247,33 @@ export function MilanTransitDashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {metroLines.map(line => (
-              <Card key={line.line} className="bg-gray-800 border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-200">
+              <Card key={line.line} className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-200">
                 <div className={`${line.color.replace('bg-[', 'bg-').replace(']', '')} p-5 text-white`}>
                   <h3 className="text-xl font-bold">Line {line.line}</h3>
                 </div>
                 <div className="p-5">
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center text-gray-200">
-                      <span className="text-gray-400">Status:</span>
+                    <div className="flex justify-between items-center text-gray-900">
+                      <span className="text-gray-600">Status:</span>
                       <span className={`px-3 py-1 rounded-full ${
-                        line.status === 'Normal' ? 'bg-green-900 text-green-200' : 
-                        'bg-yellow-900 text-yellow-200'
+                        line.status === 'Normal' ? 'bg-green-100 text-green-800' : 
+                        'bg-yellow-100 text-yellow-800'
                       }`}>
                         {line.status}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-gray-200">
-                      <span className="text-gray-400">Next Train:</span>
+                    <div className="flex justify-between items-center text-gray-900">
+                      <span className="text-gray-600">Next Train:</span>
                       <span className="font-medium">{line.nextTrain}</span>
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-gray-900">
                       <div className="font-medium mb-1">Main Route:</div>
-                      <div className="text-gray-300">{line.mainRoute}</div>
+                      <div className="text-gray-600">{line.mainRoute}</div>
                       {line.branches.length > 0 && (
                         <div className="mt-2">
                           <div className="font-medium mb-1">Branches:</div>
                           {line.branches.map((branch, index) => (
-                            <div key={index} className="text-gray-300 text-sm">
+                            <div key={index} className="text-gray-600 text-sm">
                               {branch}
                             </div>
                           ))}
