@@ -3,6 +3,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "react"
+    "jsx": "react",
+    "esModuleInterop": true
   }
 }

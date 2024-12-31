@@ -42,7 +42,6 @@ export function MilanTransitDashboard() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
-  const videoRef = useRef<HTMLVideoElement>(https://www.dailymotion.com/cdn/live/video/x8u05e4.m3u8?sec=WpDBDJZBHKQAodqf2F5qb0fV3dAaNSJgfJBlbrBTkh7fXvYiMXw-Cx78_Vu0hp8C);
 
   const breakingNews: NewsItem[] = [
     {
@@ -63,7 +62,7 @@ export function MilanTransitDashboard() {
   ];
 
   const [weatherData] = useState({
-    temperature: '22°C',
+    temperature: '8°C',
     condition: 'Partly Cloudy',
     humidity: '65%',
     precipitation: '30%'
@@ -211,49 +210,44 @@ export function MilanTransitDashboard() {
           </div>
         </div>
       </div>
-
+            
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Top Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="p-4">
-            <div className="flex justify-between items-center text-gray-800">
-              <Clock className="text-blue-600 h-6 w-6" />
-              <span className="text-2xl font-mono">{currentTime.toLocaleTimeString()}</span>
-            </div>
-          </Card>
+        {/* Top Row with Live TV */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            <Card>
+              <div className="p-4">
+                <div className="flex justify-between items-center text-gray-800">
+                  <Clock className="text-blue-600 h-6 w-6" />
+                  <span className="text-2xl font-mono">{currentTime.toLocaleTimeString()}</span>
+                </div>
+              </div>
+            </Card>
+          </div>
           
-          <Card className="p-4">
-            <div className="flex items-center justify-between text-gray-800">
-              <div className="flex items-center">
-                <CloudRain className="text-purple-500 h-6 w-6 mr-2" />
-                <span className="text-lg font-medium">Weather</span>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">{weatherData.temperature}</div>
-                <div className="text-gray-600">{weatherData.condition}</div>
-                <div className="text-sm text-gray-500">
-                  Humidity: {weatherData.humidity} • Rain: {weatherData.precipitation}
+          <div className="md:col-span-2">
+            <Card>
+              <div className="p-0">
+                <div className="relative">
+                  <div className="absolute top-4 left-4 z-10 flex items-center space-x-2">
+                    <div className="flex items-center bg-red-600 text-white px-3 py-1 rounded-full">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse mr-2" />
+                      <span className="text-sm font-semibold">LIVE TV</span>
+                    </div>
+                  </div>
+                  <div className="w-full aspect-video bg-black">
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.dailymotion.com/cdn/live/video/x8u05e4.m3u8?sec=WpDBDJZBHKQAodqf2F5qb0fV3dAaNSJgfJBlbrBTkh7fXvYiMXw-Cx78_Vu0hp8C"
+                      allow="autoplay; fullscreen"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center justify-between text-gray-800">
-              <div className="flex items-center">
-                <Wind className="text-green-500 h-6 w-6 mr-2" />
-                <span className="text-lg font-medium">Air Quality</span>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">{airQuality.index} AQI</div>
-                <div className="text-green-600 font-medium">{airQuality.status}</div>
-                <div className="text-sm text-gray-500">
-                  PM2.5: {airQuality.pm25} • PM10: {airQuality.pm10}
-                </div>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
 
         {/* Metro Lines */}
