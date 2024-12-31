@@ -141,7 +141,7 @@ export function MilanTransitDashboard() {
             <TrainFront className="h-8 w-8 text-blue-500" />
             <div className="flex flex-col">
               <span className="text-xl font-bold text-white">Milano Transit</span>
-              <span className="text-sm text-black">Real-time Transportation Hub</span>
+              <span className="text-sm text-gray-400">Real-time Transportation Hub</span>
             </div>
           </div>
         </div>
@@ -218,6 +218,7 @@ export function MilanTransitDashboard() {
                   <iframe
                     className="w-full h-full"
                     src="https://www.dailymotion.com/embed/video/x8u05e4?autoplay=1"
+                    title="Live Stream"
                     allow="autoplay; fullscreen"
                     allowFullScreen
                   ></iframe>
@@ -347,3 +348,7 @@ export function MilanTransitDashboard() {
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
