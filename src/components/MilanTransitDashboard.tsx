@@ -236,13 +236,19 @@ export function MilanTransitDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {metroLines.map(line => (
               <Card key={line.line} className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className={`${line.color.replace('bg-[', 'bg-').replace(']', '')} p-5 text-black`}>
+                <div className={`${
+                  line.line === 'M1' ? 'bg-red-600' :
+                  line.line === 'M2' ? 'bg-green-600' :
+                  line.line === 'M3' ? 'bg-yellow-400' :
+                  line.line === 'M4' ? 'bg-blue-600' :
+                  'bg-purple-600'
+                } p-5 ${line.line === 'M3' ? 'text-black' : 'text-white'}`}>
                   <h3 className="text-xl font-bold">Line {line.line}</h3>
                 </div>
-                <div className="p-5">
+                <div className="p-5 bg-gray-50">
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center text-gray-900">
-                      <span className="text-gray-600">Status:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-800 font-medium">Status:</span>
                       <span className={`px-3 py-1 rounded-full ${
                         line.status === 'Normal' ? 'bg-green-100 text-green-800' : 
                         'bg-yellow-100 text-yellow-800'
@@ -250,18 +256,18 @@ export function MilanTransitDashboard() {
                         {line.status}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-gray-900">
-                      <span className="text-gray-600">Next Train:</span>
-                      <span className="font-medium">{line.nextTrain}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-800 font-medium">Next Train:</span>
+                      <span className="font-bold text-gray-900">{line.nextTrain}</span>
                     </div>
-                    <div className="text-sm text-gray-900">
-                      <div className="font-medium mb-1">Main Route:</div>
-                      <div className="text-gray-600">{line.mainRoute}</div>
+                    <div className="text-sm">
+                      <div className="font-semibold text-gray-800 mb-1">Main Route:</div>
+                      <div className="text-gray-700">{line.mainRoute}</div>
                       {line.branches.length > 0 && (
                         <div className="mt-2">
-                          <div className="font-medium mb-1">Branches:</div>
+                          <div className="font-semibold text-gray-800 mb-1">Branches:</div>
                           {line.branches.map((branch, index) => (
-                            <div key={index} className="text-gray-600 text-sm">
+                            <div key={index} className="text-gray-700 text-sm">
                               {branch}
                             </div>
                           ))}
@@ -283,47 +289,54 @@ export function MilanTransitDashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {airportServices.map((airport, index) => (
-              <Card key={index} className="bg-gray-800 border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <div className="bg-blue-900 p-5 text-black">
+              <Card key={index} className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <div className="bg-blue-700 p-5 text-white">
                   <h3 className="text-xl font-bold">{airport.airport}</h3>
                 </div>
-                <div className="p-5">
-                  <div className="space-y-4">
+                <div className="p-5 bg-gray-50">
+                  <div className="space-y-6">
                     {airport.services.map((service, sIndex) => (
-                      <div key={sIndex} className="text-gray-200">
-                        <h4 className="font-bold text-lg mb-2">{service.name}</h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Route:</span>
-                            <span>{service.route}</span>
+                      <div key={sIndex} className="text-gray-900">
+                        <h4 className="font-bold text-lg mb-3 text-blue-800">{service.name}</h4>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between items-center bg-white p-2 rounded-lg">
+                            <span className="font-medium text-gray-700">Route:</span>
+                            <span className="text-gray-900">{service.route}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Frequency:</span>
-                            <span>{service.frequency}</span>
+                          <div className="flex justify-between items-center bg-white p-2 rounded-lg">
+                            <span className="font-medium text-gray-700">Frequency:</span>
+                            <span className="text-gray-900">{service.frequency}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Duration:</span>
-                            <span>{service.duration}</span>
+                          <div className="flex justify-between items-center bg-white p-2 rounded-lg">
+                            <span className="font-medium text-gray-700">Duration:</span>
+                            <span className="text-gray-900">{service.duration}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Next:</span>
-                            <span>{service.nextDeparture}</span>
+                          <div className="flex justify-between items-center bg-white p-2 rounded-lg">
+                            <span className="font-medium text-gray-700">Next:</span>
+                            <span className="font-bold text-blue-800">{service.nextDeparture}</span>
                           </div>
                         </div>
                       </div>
                     ))}
-                    <div className="mt-4">
-                      <h4 className="font-bold text-lg mb-2 text-gray-200">Next Flights</h4>
+                    <div className="pt-4 border-t border-gray-200">
+                      <h4 className="font-bold text-lg mb-3 text-blue-800">Next Flights</h4>
                       <div className="space-y-2">
                         {airport.flights.map((flight, fIndex) => (
-                          <div key={fIndex} className="flex justify-between text-sm text-gray-200">
-                            <span>{flight.flight} to {flight.destination}</span>
-                            <span className={`${
-                              flight.status === 'On Time' ? 'text-green-400' : 
-                              flight.status === 'Boarding' ? 'text-blue-400' : 'text-yellow-400'
-                            }`}>
-                              {flight.status} {flight.time}
-                            </span>
+                          <div key={fIndex} className="flex justify-between items-center bg-white p-3 rounded-lg text-sm">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-900">{flight.flight}</span>
+                              <span className="text-gray-600">to {flight.destination}</span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className={`font-medium ${
+                                flight.status === 'On Time' ? 'text-green-600' : 
+                                flight.status === 'Boarding' ? 'text-blue-600' : 
+                                'text-yellow-600'
+                              }`}>
+                                {flight.status}
+                              </span>
+                              <span className="font-bold text-gray-900">{flight.time}</span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -334,7 +347,3 @@ export function MilanTransitDashboard() {
             ))}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
