@@ -5,13 +5,6 @@ import { Train, Plane, TrainFront } from 'lucide-react';
 import { Card } from './ui/card';
 
 // 定义类型接口
-interface NewsItem {
-  en: string;
-  it: string;
-  zh: string;
-  [key: string]: string;
-}
-
 interface MetroLine {
   line: string;
   color: string;
