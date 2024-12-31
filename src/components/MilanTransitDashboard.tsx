@@ -42,6 +42,7 @@ export function MilanTransitDashboard() {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
+  const videoRef = useRef<HTMLVideoElement>(https://www.dailymotion.com/cdn/live/video/x8u05e4.m3u8?sec=WpDBDJZBHKQAodqf2F5qb0fV3dAaNSJgfJBlbrBTkh7fXvYiMXw-Cx78_Vu0hp8C);
 
   const breakingNews: NewsItem[] = [
     {
