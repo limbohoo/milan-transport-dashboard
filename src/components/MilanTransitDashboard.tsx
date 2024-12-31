@@ -32,10 +32,6 @@ interface Airport {
 }
 
 export function MilanTransitDashboard() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [localTime, setLocalTime] = useState(new Date());
-  
-
   const [metroLines] = useState<MetroLine[]>([
     { 
       line: 'M1', 
@@ -135,14 +131,6 @@ export function MilanTransitDashboard() {
       ]
     }
   ]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-      setLocalTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900">
