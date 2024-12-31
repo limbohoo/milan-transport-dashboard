@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Train, Clock, Plane, TrainFront } from 'lucide-react';
+import { Train, Plane, TrainFront } from 'lucide-react';
 import { Card } from './ui/card';
 
 // 定义类型接口
@@ -39,27 +39,7 @@ interface Airport {
 }
 
 export function MilanTransitDashboard() {
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'it' | 'zh'>('en');
-
-  const breakingNews: NewsItem[] = [
-    {
-      en: "Major Cultural Festival at Piazza Duomo",
-      it: "Grande Festival Culturale in Piazza Duomo",
-      zh: "米兰大教堂广场文化节",
-    },
-    {
-      en: "Metro Line M4 Extension Project Approved",
-      it: "Approvato il Progetto di Estensione della Linea M4",
-      zh: "地铁4号线延伸工程获批",
-    },
-    {
-      en: "International Tech Week Coming to Milano",
-      it: "Settimana Internazionale della Tecnologia a Milano",
-      zh: "国际科技周即将在米兰举办",
-    },
-  ];
 
   const [metroLines] = useState<MetroLine[]>([
     { 
