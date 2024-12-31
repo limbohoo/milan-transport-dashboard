@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Train, Plane, TrainFront } from 'lucide-react';
 import { Card } from './ui/card';
 
@@ -132,6 +132,16 @@ export function MilanTransitDashboard() {
     }
   ]);
 
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Header */}
@@ -160,7 +170,7 @@ export function MilanTransitDashboard() {
                   <div className="flex flex-col items-center">
                     <div className="text-gray-400 mb-1 font-medium">Milano</div>
                     <div className="font-mono text-5xl font-bold text-yellow-400 tabular-nums tracking-wider filter drop-shadow-lg animate-pulse">
-                      {new Date().toLocaleTimeString('it-IT', {
+                      {time.toLocaleTimeString('it-IT', {
                         hour12: false,
                         hour: '2-digit',
                         minute: '2-digit',
@@ -184,7 +194,7 @@ export function MilanTransitDashboard() {
                   <div className="flex flex-col items-center">
                     <div className="text-gray-400 mb-1 font-medium">Local Time</div>
                     <div className="font-mono text-5xl font-bold text-green-400 tabular-nums tracking-wider filter drop-shadow-lg animate-pulse">
-                      {new Date().toLocaleTimeString('en-US', {
+                      {time.toLocaleTimeString('en-US', {
                         hour12: false,
                         hour: '2-digit',
                         minute: '2-digit',
